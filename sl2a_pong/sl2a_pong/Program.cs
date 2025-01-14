@@ -7,6 +7,9 @@ class Program
 {
     static void Main()
     {
+        //define the main thread in this application
+        Thread mainThread = Thread.CurrentThread;
+
         //empty the whole console
         Console.Clear();
 
@@ -15,22 +18,21 @@ class Program
         PongHandler pong = new();
         bool exit = false;
 
-        //define the main thread in this application
-        Thread mainThread = Thread.CurrentThread;
-
         string input = Console.ReadLine();
         switch (input)
         {
-           case "1":           
-           pong.PlayPong();
-
+           case "1":
+                //if this case is called execute the playpong method
+                pong.PlayPong();
            break;
            case "2":
-           menu.DisplayDateTime();
+                //if this case is called execute the dislay the curent date and time on the screen
+                menu.DisplayDateTime();
 
            break;
            case "3":
-           exit = true;
+                //if this case is called stop the console app and close
+                exit = true;
 
            break;
            default:
@@ -40,6 +42,7 @@ class Program
 
         if (!exit)
         {
+            //if no input has been given yet than display this message
            Console.WriteLine("\n Press any key to return to the main menu...");
            Console.ReadKey();
         }  
