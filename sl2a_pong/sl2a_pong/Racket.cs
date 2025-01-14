@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace sl2a_pong
 {
-   public class Racket : PongHandler
+   public class Racket : PongHandler 
    {
       //declare variables
       private string racketTile;
@@ -15,7 +16,6 @@ namespace sl2a_pong
       private int leftRacketHeight;
       private int rightRacketHeight;
       private int fieldLength, fieldWidth;
-
       private int indicator;
       
       //Class constructor
@@ -33,28 +33,30 @@ namespace sl2a_pong
 
         //The indicator is the indication wich side of the game this racket shoud be, Left(1) or Right(0)
         indicator = ParIndicator;
+
+        //Create thread to execute the print method.
+        Thread racketPrinting = new Thread(PrintRacket);
+        racketPrinting.Start();
       }
       
       //function to print the racket on the screen
       public void PrintRacket() 
       {
-         for (int i = 0; i < racketLength; i++) 
-         { 
-            if (indicator == 1) 
-            {
-               Console.SetCursorPosition(0, i + 1 + leftRacketHeight);
-               //Console.WriteLine(racketTile);
-               Print(racketTile);
-            }
-            else if (indicator == 0) 
-            {
-                Console.SetCursorPosition(fieldLength - 1, i + 1 + rightRacketHeight);
-                //Console.WriteLine(racketTile);
-                Print(racketTile);
-            }
-         }
+          while (GetRuntime() == true)
+          {
+              for (int i = 0; i < racketLength; i++)
+              {
+                 //print the racket that the player will use to deflect the ball
+                 Console.SetCursorPosition(0, i + 1 + leftRacketHeight);
+                 //Console.WriteLine(racketTile);
+                 Print(racketTile);
+                 Console.SetCursorPosition(fieldLength - 1, i + 1 + rightRacketHeight);
+                 //Console.WriteLine(racketTile);
+                 Print(racketTile);
+              }
+          }
       }
-      
+
       //function to move the racket up and down
       public void MoveRacket() 
       {

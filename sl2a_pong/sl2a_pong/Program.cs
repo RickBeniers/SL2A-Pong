@@ -3,53 +3,45 @@ using System.ComponentModel.Design;
 
 namespace sl2a_pong;
 
-class Program : ProgramBase
+class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
+        //empty the whole console
+        Console.Clear();
+
+        //define and initialise variables & classes
+        Menu menu = new();
+        PongHandler pong = new();
         bool exit = false;
 
-        while (!exit)
+        //define the main thread in this application
+        Thread mainThread = Thread.CurrentThread;
+
+        string input = Console.ReadLine();
+        switch (input)
         {
-            try 
-            { 
-                Console.Clear();
+           case "1":           
+           pong.PlayPong();
 
-                //define and initialise classes
-                //Menu menu = new Menu();
-                //PongHandler pong = new PongHandler();
+           break;
+           case "2":
+           menu.DisplayDateTime();
 
-                string input = Console.ReadLine();
-                switch (input)
-                {
-                    case "1":
-                        PongHandler pong = new PongHandler();
-                        pong.PlayPong();
-                        break;
-                    case "2":
-                        Menu menu = new Menu();
-                        menu.DisplayDateTime();
-                        break;
-                    case "3":
-                        exit = true;
-                        break;
-                    default:
-                        Console.WriteLine("Invalid option. Please try again.");
-                        //this.Print("Invalid option. Please try again.");
-                        break;
-                }
+           break;
+           case "3":
+           exit = true;
 
-                if (!exit)
-                {
-                    Console.WriteLine("\n Press any key to return to the main menu...");
-                    //this.Print("\nPress any key to return to the main menu...");
-                    Console.ReadKey();
-                }
-            }
-            catch (IOException) 
-            { 
-            
-            }
+           break;
+           default:
+           Console.WriteLine("Invalid option. Please try again.");
+           break;
         }
+
+        if (!exit)
+        {
+           Console.WriteLine("\n Press any key to return to the main menu...");
+           Console.ReadKey();
+        }  
     }
 }
