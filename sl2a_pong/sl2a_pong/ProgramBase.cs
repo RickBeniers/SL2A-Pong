@@ -14,7 +14,7 @@ public class ProgramBase
         Console.WriteLine(message);
     }
     //A method that prints a string on a specific coordinate
-    public virtual void Print(string message, int X, int Y)
+    public virtual async Task Print(string message, int X, int Y)
     {
         Console.SetCursorPosition(X, Y);
         Console.WriteLine(message);

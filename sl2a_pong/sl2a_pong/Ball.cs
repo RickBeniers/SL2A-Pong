@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace sl2a_pong
 {
-   public class Ball : PongHandler
-   {
+    public class Ball : PongHandler
+    {
         //declare variables/properties
         private int leftRacketHeight;
         private int rightRacketHeight;
@@ -19,7 +19,7 @@ namespace sl2a_pong
         private bool isBallGoingRight;
         private string ballTile;
 
-        public Ball() 
+        public Ball()
         {
             //initialised variables/properties
             leftRacketHeight = 0;
@@ -32,96 +32,103 @@ namespace sl2a_pong
             isBallGoingDown = true;
             isBallGoingRight = true;
         }
-        public void MoveBallObject() 
+        public async Task MoveBallObject()
         {
-            while (GetRuntime() == true)
+            await Task.Run(async () =>
             {
-                    while (!Console.KeyAvailable)
+                while (GetRuntime() == true)
+                {
+
+                    //set the position of the cursor
+                    //print the ball at the position of the cursor
+                    Print(ballTile, ballX, ballY);
+
+                    //the sleep function sets the time between 2 print operations
+                    //if the sleep function is not used the ball will basicly play the game
+                    //at a speed too high for humans to interact with.
+                    Thread.Sleep(160);
+
+                    //print empty space
+                    Print(" ", ballX, ballY);
+
+
+                    if (isBallGoingDown)
                     {
-                        ThreadPool.QueueUserWorkItem((o) =>
+                        ballY++;
+                    }
+                    else if (!isBallGoingDown)
+                    {
+                        ballY--;
+                    }
+                    if (isBallGoingRight)
+                    {
+                        ballX++;
+                    }
+                    else if (!isBallGoingRight)
+                    {
+                        ballX--;
+                    }
+
+                    if (ballY == 1 || ballY == GetFieldWidth() - 1)
+                    {
+                        isBallGoingDown = !isBallGoingDown;
+                    }
+
+                    //if the ball is o the left of the field
+                    if (ballX == 1)
+                    {
+                        //if the ball is next to the left racket, reverse the direction
+                        if (ballY >= leftRacketHeight + 1 && ballY <= leftRacketHeight + racketLength)
                         {
-                            //set the position of the cursor
-                            //print the ball at the position of the cursor
-                            Print(ballTile, ballX, ballY);
-
-                            //the sleep function sets the time between 2 print operations
-                            //if the sleep function is not used the ball will basicly play the game
-                            //at a speed too high for humans to interact with.
-                            Thread.Sleep(500);
-
-                            //print empty space
-                            Print(" ", ballX, ballY);
-                        });
-
-                        if (isBallGoingDown)
-                        {
-                            ballY++;
+                            isBallGoingRight = !isBallGoingRight;
                         }
                         else
                         {
-                            ballY--;
-                        }
-                        if (isBallGoingRight)
-                        {
-                            ballX++;
-                        }
-                        else
-                        {
-                            ballX--;
-                        }
+                            //if the ball is on the left of the field but above or below the left racket
+                            SetRightPlayerScore(GetRightPlayerScore() + 1);
+                            ballY = GetFieldWidth() / 2;
+                            ballX = GetFieldLength() / 2;
+                            await Print($"{GetLeftPlayerScore()} | {GetRightPlayerScore()}", GetScoreboardX(), GetScoreboardY());
 
-                        if (ballY == 1 || ballY == GetFieldWidth() - 1)
-                        {
-                            isBallGoingDown = !isBallGoingDown;
-                        }
-
-                        if (ballX == 1)
-                        {
-                            if (ballY >= leftRacketHeight + 1 && ballY <= leftRacketHeight + racketLength)
+                            //if the opposite player has more than 10 points he has won 
+                            //gameover
+                            if (GetRightPlayerScore() > 10)
                             {
-                                isBallGoingRight = !isBallGoingRight;
-                            }
-                            else
-                            {
-                                //rightPlayerPoints++;
-                                SetRightPlayerScore(GetRightPlayerScore() + 1);
-                                ballY = GetFieldWidth() / 2;
-                                ballX = GetFieldLength() / 2;
-                                //Console.SetCursorPosition(GetScoreboardX(), GetScoreboardY());
-                                //Console.WriteLine($"{leftPlayerPoints} | {rightPlayerPoints}");
-                                Print($"{GetLeftPlayerScore()} | {GetRightPlayerScore()}", GetScoreboardX(), GetScoreboardY());
-
-                                if (GetRightPlayerScore() > 10)
-                                {
-                                    DisplayWinner();
-                                }
-                            }
-                        }
-                        if (ballX == GetFieldLength() - 2)
-                        {
-                            if (ballY >= rightRacketHeight + 1 && ballY <= rightRacketHeight + racketLength)
-                            {
-                                isBallGoingRight = !isBallGoingRight;
-                            }
-                            else
-                            {
-                                //leftPlayerPoints++;
-                                SetLeftPlayerScore(GetLeftPlayerScore() + 1);
-                                ballY = GetFieldWidth() / 2;
-                                ballX = GetFieldLength() / 2;
-                                //Console.SetCursorPosition(GetScoreboardX(), GetScoreboardY());
-                                //Console.WriteLine($"{leftPlayerPoints} | {rightPlayerPoints}");
-                                Print($"{GetLeftPlayerScore()} | {GetRightPlayerScore()}", GetScoreboardX(), GetScoreboardY());
-
-                                if (GetLeftPlayerScore() > 10)
-                                {
-                                    DisplayWinner();
-                                }
+                                DisplayWinner();
                             }
                         }
                     }
-                
-            }
+
+                    //if the ball is on the right of the field
+                    if (ballX == GetFieldLength() - 2)
+                    {
+                        //if the ball is next to the right racket, reverse the direction
+                        if (ballY >= rightRacketHeight + 1 && ballY <= rightRacketHeight + racketLength)
+                        {
+                            isBallGoingRight = !isBallGoingRight;
+                        }
+                        else
+                        {
+                            //if the ball is on the right of the field but above or below the right racket
+                            //give the oposite player a point
+                            SetLeftPlayerScore(GetLeftPlayerScore() + 1);
+                            ballY = GetFieldWidth() / 2;
+                            ballX = GetFieldLength() / 2;
+                            await Print($"{GetLeftPlayerScore()} | {GetRightPlayerScore()}", GetScoreboardX(), GetScoreboardY());
+
+                            //if the opposite player has more than 10 points he has won 
+                            //gameover
+                            if (GetLeftPlayerScore() > 10)
+                            {
+                                DisplayWinner();
+                            }
+                        }
+                    }
+                    //Pause the thread before the logic is executed again
+                    //if this sleep method is removed the game will play itself out in less than 1 sec
+                    Thread.Sleep(150);
+                }
+            });
         }
-   }
+    }
 }

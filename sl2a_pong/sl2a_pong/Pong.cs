@@ -4,7 +4,7 @@ using System.Security.AccessControl;
 
 namespace sl2a_pong;
 
-public class PongHandler : ProgramBase 
+public class PongHandler : ProgramBase
 {
     //declare variables
     private string fieldTile;
@@ -37,40 +37,26 @@ public class PongHandler : ProgramBase
         line = string.Concat(Enumerable.Repeat(fieldTile, fieldLength));
     }
 
-    public void PlayPong()
+    public async Task PlayPong()
     {
         //empty the console
         Console.Clear();
 
-        //During runtime, tell the rackets to listen for keyboardinputs and move accordingly.
-        //both the left and right rackets have a seperate thread to handle there individual movement
-        //both methods are called by Lambda expression
-        //And create new thread to handle the ball movement
-        //ThreadPool.QueueUserWorkItem((o) => { leftRacket.MoveRacket(); });
-        //Thread moveRightRacket = new Thread(() => { rightRacket.MoveRacket(); });
-        //Thread ballMovementThread = new Thread(() => { pongBall.MoveBallObject(); });
+        //hide the cursor
+        Console.CursorVisible = false;
 
-        while (runTime == true)
+        //move the cursor to the top left corner and print a "line"
+        //This method is executed asynchronously by use of a task
+        await Print(line, 0, 0);
+
+        //move the cursor to another position and print another "line"
+        await Print(line, 0, fieldWidth);
+
+        for (int i = 1; i < fieldWidth; i++)
         {
-            ThreadPool.QueueUserWorkItem((o) =>
-            {
-                //hide the cursor
-                Console.CursorVisible = false;
-
-                //move the cursor to the top left corner and print a "line"
-                Print(line, 0, 0);
-
-                //move the cursor to another position and print another "line"
-                Print(line, 0, fieldWidth);
-
-                for (int i = 1; i < fieldWidth; i++)
-                {
-                    //print empty space betwee the two walls of lines.
-                    Print(" ", 0, i);
-                    Print(" ", fieldLength - 1, i);
-                    Thread.Sleep(100);
-                }
-            });
+            //print empty space betwee the two walls of lines.
+            await Print(" ", 0, i);
+            await Print(" ", fieldLength - 1, i);
         }
 
         //initialise the racket classes and the ball class
@@ -79,9 +65,18 @@ public class PongHandler : ProgramBase
         Ball pongBall = new Ball();
 
         //execute the method that checks for keyboard input and changes the racket heights
+        //Execute the print racket method.
         leftRacket.MoveRacket();
+        leftRacket.PrintRacket();
+        //execute the method that checks for keyboard input and changes the racket heights
+        //Execute the print racket method.
         rightRacket.MoveRacket();
+        rightRacket.PrintRacket();
+        //Execute the method to handle the movement of the ball
+        pongBall.MoveBallObject();
 
+        //keep the console open untill Enter key is pressed
+        Console.ReadLine();
     }
     public void DisplayWinner()
     {
@@ -101,40 +96,40 @@ public class PongHandler : ProgramBase
             runTime = false;
         }
     }
-    //functions to share the fieldwidth and fieldlength with other classes (seters and getters)
-    public int GetFieldWidth() 
+    //Methods to share the fieldwidth and fieldlength with other classes (seters and getters)
+    public int GetFieldWidth()
     {
         return this.fieldWidth;
     }
-    public int GetFieldLength() 
+    public int GetFieldLength()
     {
         return this.fieldLength;
     }
-    public bool GetRuntime() 
+    public bool GetRuntime()
     {
         return this.runTime;
     }
-    public int GetScoreboardX() 
+    public int GetScoreboardX()
     {
         return this.scoreboardX;
     }
-    public int GetScoreboardY() 
+    public int GetScoreboardY()
     {
         return this.scoreboardY;
     }
-    public int GetLeftPlayerScore() 
+    public int GetLeftPlayerScore()
     {
         return this.leftPlayerPoints;
     }
-    public int GetRightPlayerScore() 
+    public int GetRightPlayerScore()
     {
         return this.rightPlayerPoints;
     }
-    public void SetLeftPlayerScore(int score) 
+    public void SetLeftPlayerScore(int score)
     {
         leftPlayerPoints = score;
     }
-    public void SetRightPlayerScore(int score) 
+    public void SetRightPlayerScore(int score)
     {
         rightPlayerPoints = score;
     }
@@ -144,7 +139,7 @@ public class PongHandler : ProgramBase
     {
         Console.WriteLine(message);
     }
-    public override void Print(string message, int X, int Y)
+    public override async Task Print(string message, int X, int Y)
     {
         lock (threadLock)
         {

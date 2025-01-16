@@ -5,7 +5,7 @@ namespace sl2a_pong;
 
 class Program
 {
-    static void Main()
+    static async Task Main()
     {
         //define the main thread in this application
         Thread mainThread = Thread.CurrentThread;
@@ -21,30 +21,28 @@ class Program
         string input = Console.ReadLine();
         switch (input)
         {
-           case "1":
+            case "1":
                 //if this case is called execute the playpong method
-                pong.PlayPong();
-           break;
-           case "2":
+                await pong.PlayPong();
+                break;
+            case "2":
                 //if this case is called execute the dislay the curent date and time on the screen
                 menu.DisplayDateTime();
 
-           break;
-           case "3":
+                break;
+            case "3":
                 //if this case is called stop the console app and close
                 exit = true;
 
-           break;
-           default:
-           Console.WriteLine("Invalid option. Please try again.");
-           break;
+                break;
+            default:
+                Console.WriteLine("Invalid option. Please try again.");
+                break;
         }
 
-        if (!exit)
+        if (!exit) 
         {
-            //if no input has been given yet than display this message
-           Console.WriteLine("\n Press any key to return to the main menu...");
-           Console.ReadKey();
-        }  
+            Console.WriteLine("Press any key to return to menu");
+        }
     }
 }
