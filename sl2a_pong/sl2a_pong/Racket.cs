@@ -1,22 +1,15 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace sl2a_pong
+﻿namespace sl2a_pong
 {
     public class Racket : PongHandler
     {
         //declare variables
         private string racketTile;
-        private int racketLength;
-        private int leftRacketHeight;
-        private int rightRacketHeight;
+        private int racketY1;
+        private int racketY2;
+        private int racketY3;
         private int fieldLength, fieldWidth;
         private int indicator;
+        private bool runtime;
 
         //Class constructor
         public Racket(int ParIndicator)
@@ -25,14 +18,22 @@ namespace sl2a_pong
             //Get the required variables from the PongHandler class
             fieldLength = GetFieldLength();
             fieldWidth = GetFieldWidth();
-
-            racketLength = GetFieldWidth() / 4;
             racketTile = "|";
-            leftRacketHeight = 0;
-            rightRacketHeight = 0;
+            racketY1 = 1;
+            racketY2 = 2;
+            racketY3 = 3;
 
-            //The indicator is the indication wich side of the game this racket shoud be, Left(1) or Right(0)
+            //set the runtime variable
+            runtime = GetRuntime();
+
+            //The indicator is the indication which side of the game this racket should be, Left(1) or Right(0)
             indicator = ParIndicator;
+
+            //Start the PrintRacket method
+            PrintRacket();
+
+            //Start the DetectMovement method
+            DetectMovement(runtime);
         }
 
         //function to print the racket on the screen
@@ -40,107 +41,206 @@ namespace sl2a_pong
         {
             await Task.Run( () =>
             {
-                while (GetRuntime() == true)
+                try
                 {
-
-                    for (int i = 0; i < racketLength; i++)
+                    while (GetRuntime() == true)
                     {
-                        //print the racket that the player will use to deflect the ball
+                        //check if the game is still running
+                        runtime = GetRuntime();
+
                         if (indicator == 1)
                         {
-                            Print(racketTile, 0, i + 1 + leftRacketHeight);
+                            //loop through the fieldWidth
+                            //Print the racket at the correct positions
+                            for (int i = 1; i < fieldWidth; i++)
+                            {
+                                try
+                                {
+                                    if (i == racketY1)
+                                    {
+                                        Print(racketTile, 0, i);
+                                    }
+                                    if (i == racketY2)
+                                    {
+                                        Print(racketTile, 0, i);
+                                    }
+                                    if (i == racketY3)
+                                    {
+                                        Print(racketTile, 0, i);
+                                    }
+                                    if (i != racketY1 && i != racketY2 && i != racketY3)
+                                    {
+                                        Print(" ", 0, i);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e.Message);
+                                    Console.WriteLine(e.StackTrace);
+                                }
+                            }
                         }
                         else if (indicator == 0)
                         {
-                            Print(racketTile, fieldLength - 1, i + 1 + rightRacketHeight);
+                            //loop through the fieldWidth
+                            //Print the racket at the correct positions
+                            for (int i = 1; i < fieldWidth; i++)
+                            {
+                                try
+                                {
+                                    if (i == racketY1)
+                                    {
+                                        Print(racketTile, fieldLength - 1, i);
+                                    }
+                                    if (i == racketY2)
+                                    {
+                                        Print(racketTile, fieldLength - 1, i);
+                                    }
+                                    if (i == racketY3)
+                                    {
+                                        Print(racketTile, fieldLength - 1, i);
+                                    }
+                                    if (i != racketY1 && i != racketY2 && i != racketY3)
+                                    {
+                                        Print(" ", fieldLength - 1, i);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e.Message);
+                                    Console.WriteLine(e.StackTrace);
+                                }
+                            }
                         }
+                        SetRacketPositions(this.racketY1, this.racketY2, this.racketY3, this.indicator);
                     }
+                    //small delay to prevent high CPU usage
+                    Task.Delay(50);
+                }
+                catch (AggregateException e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
                 }
             });
         }
 
-        //function to move the racket up and down
-        public async Task MoveRacket()
+        //method to detect the movement of the racket
+        public async Task DetectMovement(bool runtimePar) 
         {
-            await Task.Run(() =>
+            await Task.Run(() => 
             {
-                while (GetRuntime() == true)
+                try
                 {
-                    if (indicator == 1) 
+                    while (runtime == true)
                     {
-                        switch (Console.ReadKey().Key)
+                        var key = Console.ReadKey(true).Key;
+                        if (indicator == 1)
                         {
-                            //if one of the players presses the up, down, W or S keys than
-                            //change the corresponding height of the racket
-                            case ConsoleKey.UpArrow:
-                                if (rightRacketHeight > 0)
-                                {
-                                    rightRacketHeight--;
-                                }
-                                break;
-                            case ConsoleKey.DownArrow:
-                                if (rightRacketHeight < fieldWidth - racketLength - 1)
-                                {
-                                    rightRacketHeight++;
-                                }
-                                break;
-                            case ConsoleKey.W:
-                                if (leftRacketHeight > 0)
-                                {
-                                    leftRacketHeight--;
-                                }
-                                break;
-                            case ConsoleKey.S:
-                                if (leftRacketHeight < fieldWidth - racketLength - 1)
-                                {
-                                    leftRacketHeight++;
-                                }
-                                break;
+                            switch (key)
+                            {
+                                //if one of the players presses the up, down, W or S keys than
+                                //change the corresponding height of the racket
+                                case ConsoleKey.W:
+                                    //if the racket is at the bottom of the field
+                                    if ((racketY1 == fieldWidth - 3) && (racketY2 == fieldWidth - 2) && (racketY3 == fieldWidth - 1))
+                                    {
+                                        //move the racket up
+                                        this.racketY1--;
+                                        this.racketY2--;
+                                        this.racketY3--;
+                                    }
+                                    //if the racket is between the top and bottom of the field
+                                    if ((racketY1 > 1) && (racketY2 > 2) && (racketY3 > 3))
+                                    {
+                                        //move the racket up
+                                        this.racketY1--;
+                                        this.racketY2--;
+                                        this.racketY3--;
+                                    }
+                                    break;
+                                case ConsoleKey.S:
+                                    //if the racket is at the top of the field
+                                    if (racketY1 == 1 && racketY2 == 2 && racketY3 == 3)
+                                    {
+                                        //move the racket down
+                                        this.racketY1++;
+                                        this.racketY2++;
+                                        this.racketY3++;
+                                    }
+                                    //if the racket is between the top and bottom of the field
+                                    if ((racketY1 < fieldWidth - 3) && (racketY2 < fieldWidth - 2) && (racketY3 < fieldWidth - 1) && (racketY3 < fieldWidth - 1))
+                                    {
+                                        //move the racket down
+                                        this.racketY1++;
+                                        this.racketY2++;
+                                        this.racketY3++;
+                                    }
+                                    break;
+                            }
                         }
-                    }
-                    if (indicator == 0) 
-                    {
-                        switch (Console.ReadKey().Key)
+                        else if (indicator == 0)
                         {
-                            //if one of the players presses the up, down, W or S keys than
-                            //change the corresponding height of the racket
-                            case ConsoleKey.UpArrow:
-                                if (rightRacketHeight > 0)
-                                {
-                                    rightRacketHeight--;
-                                }
-                                break;
-                            case ConsoleKey.DownArrow:
-                                if (rightRacketHeight < fieldWidth - racketLength - 1)
-                                {
-                                    rightRacketHeight++;
-                                }
-                                break;
-                            case ConsoleKey.W:
-                                if (leftRacketHeight > 0)
-                                {
-                                    leftRacketHeight--;
-                                }
-                                break;
-                            case ConsoleKey.S:
-                                if (leftRacketHeight < fieldWidth - racketLength - 1)
-                                {
-                                    leftRacketHeight++;
-                                }
-                                break;
+                            switch (key)
+                            {
+                                //if one of the players presses the up, down, W or S keys than
+                                //change the corresponding height of the racket
+                                case ConsoleKey.UpArrow:
+                                    //if the racket is at the bottom of the field
+                                    if ((racketY1 == fieldWidth - 3) && (racketY2 == fieldWidth - 2) && (racketY3 == fieldWidth - 1))
+                                    {
+                                        //move the racket up
+                                        this.racketY1--;
+                                        this.racketY2--;
+                                        this.racketY3--;
+                                    }
+                                    //if the racket is between the top and bottom of the field
+                                    if ((racketY1 > 1) && (racketY2 > 2) && (racketY3 > 3))
+                                    {
+                                        //move the racket up
+                                        this.racketY1--;
+                                        this.racketY2--;
+                                        this.racketY3--;
+                                    }
+                                    break;
+                                case ConsoleKey.DownArrow:
+                                    //if the racket is at the top of the field
+                                    if (racketY1 == 1 && racketY2 == 2 && racketY3 == 3)
+                                    {
+                                        //move the racket down
+                                        this.racketY1++;
+                                        this.racketY2++;
+                                        this.racketY3++;
+                                    }
+                                    //if the racket is between the top and bottom of the field
+                                    if ((racketY1 < fieldWidth - 3) && (racketY2 < fieldWidth - 2) && (racketY3 < fieldWidth - 1) && (racketY3 < fieldWidth - 1))
+                                    {
+                                        //move the racket down
+                                        this.racketY1++;
+                                        this.racketY2++;
+                                        this.racketY3++;
+                                    }
+                                    break;
+                            }
                         }
                     }
                 }
+                catch (AggregateException e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
             });
-        }
-        //getters and setters to share required variables between classes
-        public int GetLeftRacketHeight()
-        {
-            return this.leftRacketHeight;
-        }
-        public int GetRightRacketHeight()
-        {
-            return this.rightRacketHeight;
         }
     }
 }

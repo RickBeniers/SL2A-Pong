@@ -1,22 +1,17 @@
-﻿using System;
-using System.Linq;
-using System.Security.AccessControl;
-
-namespace sl2a_pong;
+﻿namespace sl2a_pong;
 
 public class PongHandler : ProgramBase
 {
+
     //declare variables
     private string fieldTile;
     private string line;
-
     private int fieldLength, fieldWidth;
-
     private int leftPlayerPoints;
     private int rightPlayerPoints;
     private int scoreboardX;
     private int scoreboardY;
-
+    private int leftRacketY1, leftRacketY2, leftRacketY3, rightRacketY1, rightRacketY2, rightRacketY3;
     private bool runTime;
 
     //declare a lock object which only 1 thread can acces at a time
@@ -35,6 +30,13 @@ public class PongHandler : ProgramBase
         scoreboardY = fieldWidth + 3;
         runTime = true;
         line = string.Concat(Enumerable.Repeat(fieldTile, fieldLength));
+
+        leftRacketY1 = 0;
+        leftRacketY2 = 0;
+        leftRacketY3 = 0;
+        rightRacketY1 = 0;
+        rightRacketY2 = 0;
+        rightRacketY3 = 0;
     }
 
     public async Task PlayPong()
@@ -64,34 +66,52 @@ public class PongHandler : ProgramBase
         Racket rightRacket = new Racket(0);
         Ball pongBall = new Ball();
 
-        //execute the method that checks for keyboard input and changes the racket heights
-        //Execute the print racket method.
-        leftRacket.MoveRacket();
-        leftRacket.PrintRacket();
-        //execute the method that checks for keyboard input and changes the racket heights
-        //Execute the print racket method.
-        rightRacket.MoveRacket();
-        rightRacket.PrintRacket();
         //Execute the method to handle the movement of the ball
         pongBall.MoveBallObject();
 
-        //keep the console open untill Enter key is pressed
-        Console.ReadLine();
+        //keep the console open until the Escape key is held down
+        while (true)
+        {
+            if (Console.KeyAvailable)
+            {
+                var key = Console.ReadKey(true).Key;
+                if (key == ConsoleKey.Escape)
+                {
+                    break;
+                }
+            }
+
+            // Add a small delay to prevent high CPU usage
+            await Task.Delay(100);
+        }
+        while (runTime == true) 
+        { 
+            
+        }
     }
     public void DisplayWinner()
     {
         //empty the console
         Console.Clear();
+
         //place the cursor position to the top left corner
         Console.SetCursorPosition(0, 0);
+
         //display a message at the position of the cursor
         if (rightPlayerPoints > 10)
         {
+            //empty the console
+            Console.Clear();
+
             Print("Right player won!");
             runTime = false;
+            
         }
         else if (leftPlayerPoints > 10)
         {
+            //empty the console
+            Console.Clear();
+
             Print("Left player won!");
             runTime = false;
         }
@@ -133,7 +153,45 @@ public class PongHandler : ProgramBase
     {
         rightPlayerPoints = score;
     }
-
+    public void SetRacketPositions(int y1, int y2, int y3, int indicator)
+    {
+        if(indicator == 1)
+        {
+            leftRacketY1 = y1;
+            leftRacketY2 = y2;
+            leftRacketY3 = y3;
+        }
+        else if (indicator == 0)
+        {
+            rightRacketY1 = y1;
+            rightRacketY2 = y2;
+            rightRacketY3 = y3;
+        }
+    }
+    public int GetLeftRacketY1()
+    {
+        return this.leftRacketY1;
+    }
+    public int GetLeftRacketY2()
+    {
+        return this.leftRacketY2;
+    }
+    public int GetLeftRacketY3()
+    {
+        return this.leftRacketY3;
+    }
+    public int GetRightRacketY1()
+    {
+        return this.rightRacketY1;
+    }
+    public int GetRightRacketY2()
+    {
+        return this.rightRacketY2;
+    }
+    public int GetRightRacketY3()
+    {
+        return this.rightRacketY3;
+    }
     // a method derived from ProgramBase to implement a method to print to the console
     public override void Print(string message)
     {

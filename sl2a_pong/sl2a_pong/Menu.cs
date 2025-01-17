@@ -34,26 +34,52 @@ namespace sl2a_pong
 
             foreach (string item in menuItems)
             {
-                string paddedItem = item.PadRight(boxWidth - 2);
-                Print("║" + paddedItem.Substring(0, Math.Min(boxWidth - 2, paddedItem.Length)) + "║");
+                try
+                {
+                    string paddedItem = item.PadRight(boxWidth - 2);
+                    Print("║" + paddedItem.Substring(0, Math.Min(boxWidth - 2, paddedItem.Length)) + "║");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
             }
 
             // Fill the rest of the box with empty lines
             for (int i = menuItems.Length; i < boxHeight - 1; i++)
             {
-                Print("║" + new string(' ', boxWidth - 2) + "║");
+                try
+                {
+                    Print("║" + new string(' ', boxWidth - 2) + "║");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
             }
 
             // Bottom border
             Print(new string('═', boxWidth));
         }
 
-        public void DisplayDateTime()
+        public async Task DisplayDateTime()
         {
-            Console.Clear();
-            dateAndTime = $"Current Date and Time: {DateTime.Now}";
-            Thread displayDateAndTime = new Thread(new ThreadStart(Print));
-            displayDateAndTime.Start();
+            await Task.Run(() =>
+            {
+                try
+                {
+                    Console.Clear();
+                    dateAndTime = $"Current Date and Time: {DateTime.Now}";
+                    Print();
+                }
+                catch (AggregateException e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
+            });
         }
 
         // a method derived from ProgramBase to implement a method to print to the console
