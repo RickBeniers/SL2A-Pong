@@ -7,7 +7,8 @@
         private int racketY1;
         private int racketY2;
         private int racketY3;
-        private int fieldLength, fieldWidth;
+        private int fieldLength;
+        private int fieldWidth;
         private int indicator;
         private bool runtime;
 

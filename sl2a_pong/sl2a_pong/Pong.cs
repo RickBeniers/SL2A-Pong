@@ -6,12 +6,18 @@ public class PongHandler : ProgramBase
     //declare variables
     private string fieldTile;
     private string line;
-    private int fieldLength, fieldWidth;
+    private int fieldLength;
+    private int fieldWidth;
     private int leftPlayerPoints;
     private int rightPlayerPoints;
     private int scoreboardX;
     private int scoreboardY;
-    private int leftRacketY1, leftRacketY2, leftRacketY3, rightRacketY1, rightRacketY2, rightRacketY3;
+    private int leftRacketY1;
+    private int leftRacketY2;
+    private int leftRacketY3;
+    private int rightRacketY1;
+    private int rightRacketY2;
+    private int rightRacketY3;
     private bool runTime;
 
     //declare a lock object which only 1 thread can acces at a time
