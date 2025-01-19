@@ -19,9 +19,9 @@
             fieldLength = GetFieldLength();
             fieldWidth = GetFieldWidth();
             racketTile = "|";
-            racketY1 = 1;
-            racketY2 = 2;
-            racketY3 = 3;
+            racketY1 = 4;
+            racketY2 = 5;
+            racketY3 = 6;
 
             //set the runtime variable
             runtime = GetRuntime();
@@ -29,17 +29,18 @@
             //The indicator is the indication which side of the game this racket should be, Left(1) or Right(0)
             indicator = ParIndicator;
 
+            //Start the DetectMovement method
+            DetectMovement(runtime);
+
             //Start the PrintRacket method
             PrintRacket();
 
-            //Start the DetectMovement method
-            DetectMovement(runtime);
         }
 
         //function to print the racket on the screen
         public async Task PrintRacket()
         {
-            await Task.Run( () =>
+            await Task.Run(async () =>
             {
                 try
                 {
@@ -58,19 +59,19 @@
                                 {
                                     if (i == racketY1)
                                     {
-                                        Print(racketTile, 0, i);
+                                        await Print(racketTile, 0, i);
                                     }
                                     if (i == racketY2)
                                     {
-                                        Print(racketTile, 0, i);
+                                        await Print(racketTile, 0, i);
                                     }
                                     if (i == racketY3)
                                     {
-                                        Print(racketTile, 0, i);
+                                        await Print(racketTile, 0, i);
                                     }
                                     if (i != racketY1 && i != racketY2 && i != racketY3)
                                     {
-                                        Print(" ", 0, i);
+                                        await Print(" ", 0, i);
                                     }
                                 }
                                 catch (Exception e)
@@ -90,19 +91,19 @@
                                 {
                                     if (i == racketY1)
                                     {
-                                        Print(racketTile, fieldLength - 1, i);
+                                        await Print(racketTile, fieldLength - 1, i);
                                     }
                                     if (i == racketY2)
                                     {
-                                        Print(racketTile, fieldLength - 1, i);
+                                        await Print(racketTile, fieldLength - 1, i);
                                     }
                                     if (i == racketY3)
                                     {
-                                        Print(racketTile, fieldLength - 1, i);
+                                        await Print(racketTile, fieldLength - 1, i);
                                     }
                                     if (i != racketY1 && i != racketY2 && i != racketY3)
                                     {
-                                        Print(" ", fieldLength - 1, i);
+                                        await Print(" ", fieldLength - 1, i);
                                     }
                                 }
                                 catch (Exception e)
@@ -115,7 +116,7 @@
                         SetRacketPositions(this.racketY1, this.racketY2, this.racketY3, this.indicator);
                     }
                     //small delay to prevent high CPU usage
-                    Task.Delay(50);
+                    await Task.Delay(50);
                 }
                 catch (AggregateException e)
                 {
