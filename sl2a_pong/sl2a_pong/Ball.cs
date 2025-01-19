@@ -64,7 +64,7 @@
             await Task.Delay(100);
 
             //print empty space
-            //await Print(" ", x, y);
+            await Print(" ", x, y);
 
             //if the ball is at the top or bottom of the field
             if (y < 2)
